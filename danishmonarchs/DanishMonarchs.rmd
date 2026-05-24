@@ -1,0 +1,126 @@
+--- 
+title: "Danish Kings"
+author: "Misja Bjørk Lauridsen"
+date: "2026-05-24"
+output: html_document
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+## Load the kings
+
+1. Look at the dataset that are you loading and check what its columns are separated by?
+
+List what is the
+
+separator: comma(,)
+
+2. Create a `kings` object in R with the different functions below and inspect the different outputs.
+-  `read.csv()`
+-  `read_csv()`
+-  `read.csv2()` 
+-  `read_csv2()`
+```{r eval=TRUE}
+# FILL IN THE CODE BELOW and review the outputs
+kings1 <- read.csv("data/kings.csv")
+
+kings2 <- read_csv("data/kings.csv")
+
+kings3 <- read.csv2("data/kings.csv")
+
+kings4 <- read_csv2( "data/kings.csv")
+```
+
+Answer: 
+1. Which of these functions is a `tidyverse` function? Read data with it below into a `kings` object
+Marked with an underscore: 'read_csv' and 'read_csv2'
+2. What is the result of running `class()` on the `kings` object created with a tidyverse function.
+[1] "spec_tbl_df" "tbl_df" "tbl" "data.frame"
+3. How many columns does the object have when created with these different functions?
+functions with just '.csv' has 11 columns, functions with 'csv2' creates 1 column. csv utilising commas ',' as a seperator, and csv2  utilises ; as a separator in their tables.
+4. Show the dataset so that we can see how R interprets each column
+
+```{r eval = TRUE}
+# COMPLETE THE BLANKS BELOW WITH YOUR CODE, then turn the 'eval' flag in this chunk to TRUE.
+
+kings2 <- read_csv("data/kings.csv")
+
+class(kings2)
+
+
+ncol(kings2)
+
+
+view(kings2)
+
+
+```{r eval=TRUE}
+
+
+## Calculate the duration of reign for all the kings in your table
+```{r}
+# YOUR CODE
+library(tidyverse)
+library(dplyr)
+kings2 <- read_csv("data/kings.csv") %>%
+  filter(End_year != "NULL") %>%
+  filter(Start_year != "NULL") %>%
+  mutate(duration = as.numeric(End_year) - as.numeric(Start_year))
+```{r}
+#The '.csv' provided for our course has the data in the columns registered as text, so the NULL data is the actual word 'NULL' and not the lack of information 'NA' or 'NULL' so the function used is to remove the word 'NULL' or isnot equal to NULL is kept in the tibble. The numbers in the table is also text and not a numerical value, so using the as.numeric it is converted into a numerical value
+
+## Calculate the average duration of reign for all rulers
+```{r}
+# YOUR CODE
+#using 'mean()'
+mean(kings2$duration, na.rm = TRUE)
+#the result is  19.57692
+```{r}
+
+## How many and which kings enjoyed a longer-than-average duration of reign?
+
+```{r}
+# YOUR CODE
+kings2 %>%
+     filter(duration > mean(kings2$duration, na.rm = TRUE)) %>%
+     count()
+```{r}
+
+ #25 kings and queen enjoyed longer-than average duration of reign
+ #Erik 5. Klipping, Svend 2. Estridsen, Christian 5., Frederik 2., Niels, Frederik 6., Frederik 4., Hans, Christian 1. Erik 6. Menved, Christian 10., Valdemar 2. Sejr, Christian 7., Christian 9., Erik 7. af Pommern, Margrete 2., Christian 4.
+
+## How many days did the three longest-ruling monarchs rule? 
+
+# Sort kings by reign `duration` in the descending order. Select the three longest-ruling monarchs with the `slice()` function
+
+```{r}
+# YOUR CODE
+ kings2 %>%
+     arrange(desc(duration)) %>%
+     slice(1:3) %>%
+     mutate(days = duration * 366) %>%
+     select(Name, duration, days)
+```{r}
+#Answer: 1 Christian 4.|2 Margrete 2.|3 Erik 7. af Pommern
+ 
+
+## Challenge: Plot the kings' duration of reign through time
+#What is the long-term trend in the duration of reign among Danish monarchs? How does it relate to the historical violence trends ? 
+
+```{r}
+# YOUR CODE
+ kings2 %>%
+     ggplot(aes(x=as.numeric(Start_year),y=duration)) +
+     geom_point() +
+     geom_line() +
+     geom_smooth(colour="black")+
+     labs(title = "Duration of Danish monarchs' reign in years",
+          x = "Start of Reign (Year)",
+          y = "Duration (Years)") +
+     theme_minimal()
+```{r}
+#Well done!
